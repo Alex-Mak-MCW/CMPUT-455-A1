@@ -2,12 +2,10 @@
 board.py
 Cmput 455 sample code
 Written by Cmput 455 TA and Martin Mueller
-
 Implements a basic Go board with functions to:
 - initialize to a given board size
 - check if a move is legal
 - play a move
-
 The board uses a 1-dimensional representation with padding
 """
 
@@ -38,7 +36,6 @@ The GoBoard class implements a board and basic functions to play
 moves, check the end of the game, and count the acore at the end.
 The class also contains basic utility functions for writing a Go player.
 For many more utility functions, see the GoBoardUtil class in board_util.py.
-
 The board is stored as a one-dimensional array of GO_POINT in self.board.
 See coord_to_point for explanations of the array encoding.
 """
@@ -118,7 +115,6 @@ class GoBoard(object):
             return False
         board_copy: GoBoard = self.copy()
         can_play_move = board_copy.play_move(point, color)
-
         return can_play_move
 
     def end_of_game(self) -> bool:
@@ -226,6 +222,7 @@ class GoBoard(object):
         single_capture: GO_POINT = NO_POINT
         opp_block = self._block_of(nb_point)
         if not self._has_liberty(opp_block):
+            # Capture stuff
             # captures = list(where1d(opp_block))
             # self.board[captures] = EMPTY
             # if len(captures) == 1:
