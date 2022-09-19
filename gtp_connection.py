@@ -1,7 +1,6 @@
 """
 gtp_connection.py
 Module for playing games of Go using GoTextProtocol
-
 Cmput 455 sample code
 Written by Cmput 455 TA and Martin Mueller.
 Parts of this code were originally based on the gtp module 
@@ -33,7 +32,6 @@ class GtpConnection:
     def __init__(self, go_engine: GoEngine, board: GoBoard, debug_mode: bool = False) -> None:
         """
         Manage a GTP connection for a Go-playing engine
-
         Parameters
         ----------
         go_engine:
@@ -319,11 +317,23 @@ class GtpConnection:
         """ generate a move for color args[0] in {'b','w'} """
         board_color = args[0].lower()
         color = color_to_int(board_color)
+
+        # Error message with wrong color
+        if color!=self.board.current_player:
+            self.respond("Illegal move: wrong color{} for genmove".format(board_color))
+            return
+
+        all_legal_moves: List[GO_POINT] = GoBoardUtil.generate_legal_moves(self.board, color)
+        
+        # Resign process: if a player has no more moves, they will lose and resign
+        if len(all_legal_moves)==0:
+            self.respond("No more moves, resigns")
+            return
         move = self.go_engine.get_move(self.board, color)
         move_coord = point_to_coord(move, self.board.size)
         move_as_string = format_point(move_coord)
         if self.board.is_legal(move, color):
-            #self.board.play_move(move, color)
+            self.board.play_move(move, color)
             self.respond(move_as_string)
         else:
             self.respond("Illegal move: {}".format(move_as_string))
