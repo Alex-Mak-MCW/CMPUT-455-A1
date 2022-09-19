@@ -215,7 +215,7 @@ class GoBoard(object):
                     pointstack.append(nb)
         return marker
 
-    def _detect_and_process_capture(self, nb_point: GO_POINT) -> GO_POINT:
+    def _detect_capture(self, nb_point: GO_POINT) -> GO_POINT:
         """
         Check whether opponent block on nb_point is captured.
         If yes, remove the stones.
@@ -226,11 +226,13 @@ class GoBoard(object):
         single_capture: GO_POINT = NO_POINT
         opp_block = self._block_of(nb_point)
         if not self._has_liberty(opp_block):
-            captures = list(where1d(opp_block))
-            self.board[captures] = EMPTY
-            if len(captures) == 1:
-                single_capture = nb_point
-        return single_capture
+            # captures = list(where1d(opp_block))
+            # self.board[captures] = EMPTY
+            # if len(captures) == 1:
+            #     single_capture = nb_point
+            return True
+        return False
+        # return single_capture
 
     def play_move(self, point: GO_POINT, color: GO_COLOR) -> bool:
         """
@@ -240,12 +242,12 @@ class GoBoard(object):
         if not self._is_legal_check_simple_cases(point, color):
             return False
         # Special cases
-        if point == PASS:
-            self.ko_recapture = NO_POINT
-            self.current_player = opponent(color)
-            self.last2_move = self.last_move
-            self.last_move = point
-            return True
+        # if point == PASS:
+        #     self.ko_recapture = NO_POINT
+        #     self.current_player = opponent(color)
+        #     self.last2_move = self.last_move
+        #     self.last_move = point
+        #     return True
 
         # General case: deal with captures, suicide, and next ko point
         opp_color = opponent(color)
@@ -255,9 +257,12 @@ class GoBoard(object):
         neighbors = self._neighbors(point)
         for nb in neighbors:
             if self.board[nb] == opp_color:
-                single_capture = self._detect_and_process_capture(nb)
-                if single_capture != NO_POINT:
-                    single_captures.append(single_capture)
+                captured = self._detect_capture(nb)
+                if captured == True:
+                    self.board[point] = EMPTY
+                    return False
+                # if single_capture != NO_POINT:
+                #     single_captures.append(single_capture)
         block = self._block_of(point)
         if not self._has_liberty(block):  # undo suicide move
             self.board[point] = EMPTY
